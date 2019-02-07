@@ -2,14 +2,17 @@
     <div class="container">
         <div class="row">
             <div class="col-12">
-                <h1 class="text-center text-info">Breweries List</h1>
+                <h1 class="text-center text-info">Arizona Breweries List</h1>
             </div>
             <!-- /.col-12 -->
         </div>
         <!-- /.row -->
         <div class="row">
             <div class="col-6">
-                <BreweriesList  :brew-list="breweries"/>
+                <BreweriesList
+                        v-on:mouse-over-brew="mouseOverBrew"
+                        v-on:mouse-left-brew="mouseLeftBrew"
+                        :brew-list="breweries"/>
             </div>
             <!-- /.col-6 -->
             <div class="col-6">
@@ -36,14 +39,30 @@
         components: {BreweriesList, BreweriesMap},
         data: function () {
             return {
-                breweries: []
+                breweries: [],
+                normalIcon: [15,15],
+                largeIcon: [50, 50]
             }
         },
 
         mounted: function () {
             axios.get('https://api.openbrewerydb.org/breweries').then(r => {
-                this.breweries = r.data;
+                this.breweries = r.data.filter(r => r.state = 'Arizona')
+                    .map(r => {
+                        r.iconSize = this.normalIcon;
+                        return r;
+                    });
             })
+        },
+
+        methods: {
+            mouseOverBrew: function(id) {
+                this.breweries[id].iconSize = this.largeIcon;
+            },
+            mouseLeftBrew: function (id) {
+
+                this.breweries[id].iconSize = this.normalIcon;
+            }
         }
     }
 </script>
